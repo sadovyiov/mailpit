@@ -1,0 +1,38 @@
+services:
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    restart: unless-stopped
+    depends_on:
+      - caddy
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_TLS_CERT: /data/certs/DOMAIN.crt
+      MP_SMTP_TLS_KEY: /data/certs/DOMAIN.key
+      MP_UI_AUTH_FILE: /data/ui-auth
+      MP_SMPT_AUTH_FILE: /data/smtp-auth
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+    volumes:
+      - ./data:/data
+      - shared-data:/data/certs
+      - ./ui-auth:/data/ui-auth
+      - ./smtp-auth:/data/smtp-auth
+    ports:
+      - "1025:1025"
+    expose:
+      - "8025"
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - shared-data:/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/DOMAIN/
+
+volumes:
+  shared-data:

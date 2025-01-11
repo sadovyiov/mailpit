@@ -1,0 +1,7 @@
+DOMAIN {
+        reverse_proxy mailpit:8025
+        log {
+                output stdout
+                format json
+        }
+}
